@@ -58,6 +58,15 @@ def _build_database_url() -> str:
 
     explicit = os.environ.get("SMA_DATABASE_URL", "").strip()
     if explicit:
+        # Railway's Postgres addon hands out URLs like `postgresql://...` which
+        # SQLAlchemy resolves to the psycopg2 driver by default. We ship
+        # psycopg[binary] (v3), not psycopg2, so coerce the scheme to make
+        # SQLAlchemy pick the v3 dialect.
+        if explicit.startswith("postgresql://"):
+            explicit = "postgresql+psycopg://" + explicit[len("postgresql://"):]
+        elif explicit.startswith("postgres://"):
+            # Some platforms still use the old `postgres://` scheme.
+            explicit = "postgresql+psycopg://" + explicit[len("postgres://"):]
         return explicit
     # Local dev fallback: SQLite in data/. Forward-slash path works on Windows + POSIX.
     db_path = _Path("data") / "sma.db"
