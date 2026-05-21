@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 
 from sma.config import DeploymentMode, get_settings
@@ -13,6 +15,9 @@ from sma.db.session import get_db_session, get_session_factory
 from sma.web.auth.jwt import InvalidToken, issue_token
 from sma.web.auth.magic import decode_magic_link_token
 from sma.web.auth.passwords import hash_password, verify_password
+
+# Length of the self-serve free trial granted at signup (before any payment).
+SELF_SERVE_TRIAL_DAYS = 7
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -55,8 +60,8 @@ def login(payload: LoginRequest) -> TokenResponse:
 
 class SignupRequest(BaseModel):
     email: EmailStr
-    password: str
-    workspace_name: str
+    password: str = Field(min_length=8, max_length=128)
+    workspace_name: str = Field(default="", max_length=128)
 
 
 class MagicLoginRequest(BaseModel):
@@ -118,6 +123,7 @@ def signup(payload: SignupRequest) -> TokenResponse:
         tenant = Tenant(
             name=payload.workspace_name.strip() or f"{email.split('@')[0]}'s workspace",
             subscription_status=SubscriptionStatus.TRIALING.value,
+            trial_ends_at=datetime.now(timezone.utc) + timedelta(days=SELF_SERVE_TRIAL_DAYS),
         )
         session.add(tenant)
         session.flush()  # populate tenant.id

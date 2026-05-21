@@ -24,17 +24,17 @@ export default function LandingPage() {
               social passwords.
             </p>
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <Link href="/login">
-                <Button size="lg">Sign in to your workspace</Button>
+              <Link href="/signup">
+                <Button size="lg">Start your free 7-day trial</Button>
               </Link>
               <span className="text-sm text-slate-500">
-                Need an account?{" "}
-                <a
-                  href="mailto:admin@summitautomates.com?subject=Early%20access%20request"
+                Already have an account?{" "}
+                <Link
+                  href="/login"
                   className="font-medium text-blue-600 hover:underline"
                 >
-                  Request early access
-                </a>
+                  Sign in
+                </Link>
               </span>
             </div>
           </div>
@@ -107,11 +107,18 @@ export default function LandingPage() {
       <section className="mx-auto max-w-5xl px-6 py-20 text-center">
         <h2 className="text-2xl font-bold text-slate-900">Ready to try it?</h2>
         <p className="mx-auto mt-3 max-w-xl text-slate-600">
-          Get in touch and we&apos;ll set you up with a trial workspace.
+          Spin up a workspace in 30 seconds. No credit card required for the
+          first 7 days.
         </p>
-        <div className="mt-6">
-          <a href="mailto:admin@summitautomates.com?subject=Early%20access%20request">
-            <Button size="lg">Email admin@summitautomates.com</Button>
+        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link href="/signup">
+            <Button size="lg">Start free trial</Button>
+          </Link>
+          <a
+            href="mailto:admin@summitautomates.com?subject=Question%20about%20Summit%20Automates"
+            className="text-sm text-slate-600 hover:text-slate-900"
+          >
+            or email us at admin@summitautomates.com
           </a>
         </div>
       </section>

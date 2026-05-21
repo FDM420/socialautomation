@@ -8,9 +8,15 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <Link href="/" className="text-base font-semibold text-slate-900">
             Summit Automates
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-4 text-sm">
             <Link href="/login" className="text-slate-600 hover:text-slate-900">
               Sign in
+            </Link>
+            <Link
+              href="/signup"
+              className="rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700"
+            >
+              Start free trial
             </Link>
           </nav>
         </div>

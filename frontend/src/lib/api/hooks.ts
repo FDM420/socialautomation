@@ -64,6 +64,19 @@ export function useLogin(opts?: UseMutationOptions<LoginResponse, Error, LoginBo
   });
 }
 
+// Signup uses the same TokenResponse as login but at a different endpoint.
+// The backend returns 201 Created so we pull from Resp201.
+export type SignupResponse = Resp201<"/api/auth/signup", "post">;
+export type SignupBody = Body<"/api/auth/signup", "post">;
+
+export function useSignup(opts?: UseMutationOptions<SignupResponse, Error, SignupBody>) {
+  return useMutation({
+    mutationFn: (body: SignupBody) =>
+      api<SignupResponse>("/api/auth/signup", { method: "POST", body, unauthenticated: true }),
+    ...opts,
+  });
+}
+
 // ─── Me ────────────────────────────────────────────────────────────────────
 
 export type Me = Resp200<"/api/me", "get">;

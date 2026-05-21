@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -52,8 +53,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Sign in to Posty</CardTitle>
-          <CardDescription>Enter your admin credentials to continue.</CardDescription>
+          <CardTitle>Sign in to Summit Automates</CardTitle>
+          <CardDescription>Welcome back. Enter your credentials to continue.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-4">
@@ -86,6 +87,12 @@ export default function LoginPage() {
             >
               {login.isPending ? "Signing in…" : "Sign in"}
             </Button>
+            <p className="text-center text-sm text-slate-600">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="font-medium text-blue-600 hover:underline">
+                Start a free trial
+              </Link>
+            </p>
           </form>
         </CardContent>
       </Card>
