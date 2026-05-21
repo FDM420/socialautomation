@@ -1,7 +1,7 @@
 """Tenant model — the root of multi-tenancy.
 
 In Mode A (single_tenant) there's exactly one row, id=1.
-In Mode B (multi_tenant) one row per subscriber.
+In Mode B (multi_tenant) one row per subscriber, linked to a Whop membership.
 
 Every other domain table has a `tenant_id` FK pointing here.
 """
@@ -22,11 +22,32 @@ if TYPE_CHECKING:
 
 
 class SubscriptionStatus(str, Enum):
+    """Maps to Whop's membership status with two added states."""
+
     NONE = "none"            # Mode A — no billing
-    TRIALING = "trialing"    # Mode B — in 7-day trial
-    ACTIVE = "active"        # Mode B — paid + current
-    PAST_DUE = "past_due"    # Mode B — payment failed
-    CANCELLED = "cancelled"  # Mode B — cancelled
+    TRIALING = "trialing"    # Mode B — Whop status `trialing`
+    ACTIVE = "active"        # Mode B — Whop status `valid`
+    PAST_DUE = "past_due"    # Mode B — Whop status `past_due`
+    CANCELLED = "cancelled"  # Mode B — Whop status `canceled` / `expired`
+
+
+ACTIVE_STATUSES = {SubscriptionStatus.NONE.value, SubscriptionStatus.TRIALING.value, SubscriptionStatus.ACTIVE.value}
+"""Statuses that grant access to the product."""
+
+
+def whop_status_to_subscription_status(whop_status: str | None) -> str:
+    """Map a Whop membership.status string to our SubscriptionStatus enum value."""
+    if not whop_status:
+        return SubscriptionStatus.CANCELLED.value
+    s = whop_status.lower()
+    if s in {"valid", "active"}:
+        return SubscriptionStatus.ACTIVE.value
+    if s in {"trialing", "trial"}:
+        return SubscriptionStatus.TRIALING.value
+    if s in {"past_due", "unpaid"}:
+        return SubscriptionStatus.PAST_DUE.value
+    # canceled / expired / drafted / completed / anything else
+    return SubscriptionStatus.CANCELLED.value
 
 
 class Tenant(Base, TimestampMixin):
@@ -42,10 +63,19 @@ class Tenant(Base, TimestampMixin):
     )
     trial_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    # Stripe linkage (Mode B only — null in Mode A)
-    stripe_customer_id: Mapped[str | None] = mapped_column(String(64), nullable=True, unique=True)
-    stripe_subscription_id: Mapped[str | None] = mapped_column(
-        String(64), nullable=True, unique=True
+    # Whop linkage (Mode B only — null in Mode A).
+    # `whop_user_id` identifies the BUYER (Whop's user, stable across subscriptions).
+    # `whop_membership_id` identifies the SUBSCRIPTION row (one buyer can in theory have
+    # multiple memberships on different products).
+    # `whop_product_id` lets us recognize tier when we add multi-tier pricing later.
+    whop_user_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    whop_membership_id: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, unique=True, index=True
+    )
+    whop_product_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    whop_status_raw: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    whop_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
 
     # Relationships

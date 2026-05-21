@@ -8,12 +8,19 @@ On Railway / Render this is the entry-point for the `web` service.
 
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
-from typing import AsyncIterator
+# Load .env into os.environ BEFORE any module that reads os.environ.get(...) runs.
+# uvicorn doesn't do this automatically; without it, JWT_SECRET / MASTER_KEY etc.
+# raise on first use.
+from dotenv import load_dotenv as _load_dotenv  # noqa: E402
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from loguru import logger
+_load_dotenv()
+
+from contextlib import asynccontextmanager  # noqa: E402
+from typing import AsyncIterator  # noqa: E402
+
+from fastapi import FastAPI  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from loguru import logger  # noqa: E402
 
 from sma import __version__
 from sma.config import get_settings
@@ -37,6 +44,7 @@ from sma.web.routers import (
     topic_sources as topic_sources_routes,
     topics as topics_routes,
     usage as usage_routes,
+    whop_webhook as whop_webhook_routes,
 )
 
 
@@ -66,13 +74,24 @@ def create_app() -> FastAPI:
         lifespan=_lifespan,
     )
 
-    # CORS: in dev allow any origin (Next.js will be on :3000). In production
-    # the frontend will be served from the same Railway project so CORS is moot,
-    # but allowing the configured admin domain is the future-proof move.
+    # CORS:
+    #   - In dev (CORS_ALLOWED_ORIGINS unset) we allow any origin so the
+    #     localhost:3100 Next.js dev server can hit localhost:8000.
+    #   - In production set CORS_ALLOWED_ORIGINS to a comma-separated list
+    #     (e.g. "https://app.summitautomates.com,https://summitautomates.com").
+    import os as _os
+    cors_origins_env = _os.environ.get("CORS_ALLOWED_ORIGINS", "").strip()
+    cors_origins = (
+        [o.strip() for o in cors_origins_env.split(",") if o.strip()]
+        if cors_origins_env
+        else ["*"]
+    )
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # tighten in Phase 4 prod config
-        allow_credentials=True,
+        allow_origins=cors_origins,
+        # `allow_credentials=True` + wildcard origin is rejected by browsers.
+        # Toggle credentials off when wildcarding (dev only).
+        allow_credentials=(cors_origins != ["*"]),
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -80,6 +99,7 @@ def create_app() -> FastAPI:
     # Routers — unauthenticated
     app.include_router(health_routes.router)
     app.include_router(auth_routes.router)
+    app.include_router(whop_webhook_routes.router)
 
     # Routers — authenticated (each route depends on CurrentUser)
     app.include_router(me_routes.router)

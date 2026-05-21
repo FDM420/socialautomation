@@ -10,7 +10,8 @@ from sma.config import DeploymentMode, get_settings
 from sma.db.models.tenant import SubscriptionStatus, Tenant
 from sma.db.models.user import User, UserRole
 from sma.db.session import get_db_session, get_session_factory
-from sma.web.auth.jwt import issue_token
+from sma.web.auth.jwt import InvalidToken, issue_token
+from sma.web.auth.magic import decode_magic_link_token
 from sma.web.auth.passwords import hash_password, verify_password
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -56,6 +57,39 @@ class SignupRequest(BaseModel):
     email: EmailStr
     password: str
     workspace_name: str
+
+
+class MagicLoginRequest(BaseModel):
+    token: str
+
+
+@router.post("/magic-login", response_model=TokenResponse)
+def magic_login(payload: MagicLoginRequest) -> TokenResponse:
+    """Exchange a magic-link JWT (from email) for a long-lived session JWT.
+
+    This is how SaaS buyers sign in for the first time after subscribing
+    on Whop. They click the link in the welcome email which carries them
+    to /auth/magic on the frontend; the frontend POSTs the token here.
+    """
+    try:
+        user_id, tenant_id = decode_magic_link_token(payload.token)
+    except InvalidToken as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    SessionLocal = get_session_factory()
+    with SessionLocal() as session:
+        user = session.execute(
+            select(User).where(User.id == user_id).execution_options(skip_tenant_filter=True)
+        ).scalar_one_or_none()
+        if user is None or user.tenant_id != tenant_id:
+            raise HTTPException(status_code=400, detail="magic link no longer valid")
+        token = issue_token(user_id=user.id, tenant_id=user.tenant_id, role=user.role)
+        return TokenResponse(
+            access_token=token,
+            user_id=user.id,
+            tenant_id=user.tenant_id,
+            role=user.role,
+        )
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
