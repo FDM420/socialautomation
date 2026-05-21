@@ -25,7 +25,9 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
 WORKDIR /build
 
 # Copy only what's needed for dep resolution first (better Docker cache hit rate).
-COPY pyproject.toml ./
+# README.md is required because pyproject.toml's `readme = "README.md"` field
+# makes hatchling validate the file at metadata-generation time.
+COPY pyproject.toml README.md ./
 COPY src/sma/__init__.py src/sma/__init__.py
 
 RUN python -m venv /venv && \
