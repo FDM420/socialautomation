@@ -18,7 +18,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main className="flex-1">{children}</main>
       <footer className="border-t border-slate-200 py-8 text-sm text-slate-500">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 px-6 sm:flex-row">
-          <span>© {new Date().getFullYear()} Summit Automates. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()} Summit Systems (Private) Limited. All rights reserved.
+          </span>
           <div className="flex gap-5">
             <Link href="/terms" className="hover:text-slate-900">
               Terms

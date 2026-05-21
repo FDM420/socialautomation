@@ -15,12 +15,19 @@ export default function TermsPage() {
 
       <p>
         These Terms of Service (&quot;Terms&quot;) govern your use of{" "}
-        <strong>Summit Automates</strong> (&quot;the Service&quot;), operated by{" "}
-        <em>[REPLACE WITH FULL LEGAL ENTITY NAME], a limited liability
-        company registered in Pakistan</em> (&quot;Summit&quot;, &quot;we&quot;,
-        or &quot;us&quot;), available at{" "}
-        <a href="https://summitautomates.com">summitautomates.com</a>. By
-        accessing or using the Service, you agree to these Terms.
+        <strong>Summit Automates</strong> (&quot;the Service&quot;), a product
+        operated by <strong>Summit Systems (Private) Limited</strong>, a
+        private limited company incorporated in Pakistan under Corporate
+        Unique Identification Number 0324466 (&quot;Summit&quot;,
+        &quot;we&quot;, or &quot;us&quot;), with registered office at{" "}
+        <em>
+          Office&nbsp;# 3, First Floor, Mughal Market, Al-Rehman Arcade,
+          Sector G-13/2, Islamabad, Pakistan
+        </em>
+        , available at{" "}
+        <a href="https://summitautomates.com">summitautomates.com</a> and{" "}
+        <a href="https://app.summitautomates.com">app.summitautomates.com</a>
+        . By accessing or using the Service, you agree to these Terms.
       </p>
 
       <h2>1. What the Service does</h2>
@@ -207,9 +214,8 @@ export default function TermsPage() {
         These Terms are governed by and construed in accordance with the laws
         of the <strong>Islamic Republic of Pakistan</strong>, without regard
         to its conflict-of-law principles. You agree that the courts of{" "}
-        <em>[REPLACE WITH PRINCIPAL PLACE OF BUSINESS, e.g. Karachi]</em>,
-        Pakistan, will have exclusive jurisdiction over any dispute arising
-        out of or relating to these Terms.
+        <em>Islamabad</em>, Pakistan, will have exclusive jurisdiction over
+        any dispute arising out of or relating to these Terms.
       </p>
 
       <h2>13. Changes to these Terms</h2>

@@ -15,12 +15,19 @@ export default function PrivacyPage() {
 
       <p>
         This Privacy Policy describes how <strong>Summit Automates</strong>{" "}
-        (&quot;we&quot;, &quot;us&quot;, or &quot;Summit&quot;), operated by{" "}
-        <em>[REPLACE WITH FULL LEGAL ENTITY NAME], a limited liability company registered in
-        Pakistan</em>, collects, stores, processes, and discloses information
-        when you use the service available at{" "}
-        <a href="https://summitautomates.com">summitautomates.com</a> (the
-        &quot;Service&quot;).
+        (&quot;we&quot;, &quot;us&quot;, or &quot;Summit&quot;), a product
+        operated by <strong>Summit Systems (Private) Limited</strong>, a
+        private limited company incorporated in Pakistan (Corporate Unique
+        Identification Number 0324466) with registered office at{" "}
+        <em>
+          Office&nbsp;# 3, First Floor, Mughal Market, Al-Rehman Arcade,
+          Sector G-13/2, Islamabad, Pakistan
+        </em>
+        , collects, stores, processes, and discloses information when you
+        use the service available at{" "}
+        <a href="https://summitautomates.com">summitautomates.com</a> and{" "}
+        <a href="https://app.summitautomates.com">app.summitautomates.com</a>{" "}
+        (the &quot;Service&quot;).
       </p>
 
       <h2>1. Information we collect</h2>
