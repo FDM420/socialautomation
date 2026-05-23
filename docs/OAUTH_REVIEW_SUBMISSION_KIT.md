@@ -15,22 +15,45 @@ copy-paste-ready answers tuned to Summit Automates' actual functionality.
 
 ---
 
-## Prerequisites — must be live before you submit anything
+## Production topology — IMPORTANT
 
-These four URLs must be publicly reachable from your domain BEFORE any
-platform will accept a submission. They're already drafted in the codebase
-under `frontend/src/app/(public)/` — you just need to deploy.
+The product runs across **three subdomains**. Don't mix them up when filling
+in the review forms:
+
+| Subdomain | What it is | Used for |
+|---|---|---|
+| `summitautomates.com` | Marketing site (separate repo) | "Application home page" / "Website" fields |
+| `app.summitautomates.com` | SaaS frontend (Next.js) | Legal URLs, reviewer login/signup, demo screencast |
+| `api.summitautomates.com` | SaaS backend (FastAPI) | **OAuth redirect/callback URLs only** |
+
+## Prerequisites — all live as of this deploy ✅
+
+These four URLs are publicly reachable over HTTPS (verified — Let's Encrypt
+certs valid):
 
 | URL | Purpose | Status |
 |---|---|---|
-| `https://summitautomates.com/` | Landing page describing the product | ✅ drafted |
-| `https://summitautomates.com/terms` | Terms of Service | ✅ drafted |
-| `https://summitautomates.com/privacy` | Privacy Policy | ✅ drafted |
-| `https://summitautomates.com/data-deletion` | Data Deletion Instructions (Meta-required) | ✅ drafted |
+| `https://summitautomates.com/` | Marketing landing page | ✅ live |
+| `https://app.summitautomates.com/terms` | Terms of Service | ✅ live (200) |
+| `https://app.summitautomates.com/privacy` | Privacy Policy | ✅ live (200) |
+| `https://app.summitautomates.com/data-deletion` | Data Deletion Instructions (Meta-required) | ✅ live (200) |
 
-**Before submitting any OAuth review:** replace the two `[REPLACE WITH …]`
-placeholders in `terms/page.tsx` and `privacy/page.tsx` with your registered
-LLC's full legal name and principal place of business, then deploy.
+The legal entity placeholders are already filled in: **Summit Systems
+(Private) Limited**, Corporate UIN 0324466, registered office Office # 3,
+First Floor, Mughal Market, Al-Rehman Arcade, Sector G-13/2, Islamabad,
+Pakistan. Governing law: Islamabad, Pakistan.
+
+### OAuth redirect/callback URLs (production) — copy exactly
+
+These live on the **api** subdomain (the FastAPI backend). Register the
+matching one in each platform's developer console:
+
+| Platform | Redirect / Callback URL |
+|---|---|
+| Meta (FB + IG) | `https://api.summitautomates.com/api/oauth/meta/callback` |
+| Google (YouTube) | `https://api.summitautomates.com/api/oauth/youtube/callback` |
+| TikTok | `https://api.summitautomates.com/api/oauth/tiktok/callback` |
+| LinkedIn | `https://api.summitautomates.com/api/oauth/linkedin/callback` |
 
 ---
 
@@ -39,7 +62,10 @@ LLC's full legal name and principal place of business, then deploy.
 ### Company / app identity
 
 - **Product name**: Summit Automates
-- **Domain**: summitautomates.com
+- **Legal entity**: Summit Systems (Private) Limited (Pakistan, Corporate UIN 0324466)
+- **Marketing domain**: summitautomates.com
+- **App domain**: app.summitautomates.com
+- **API domain**: api.summitautomates.com
 - **App description (one-line)**: AI that researches, writes, films, and schedules social videos for niche operators.
 - **App description (longer)**:
   > Summit Automates is a SaaS tool that helps individual creators and small businesses publish consistent social-media video content. The user defines a content niche, brings their own AI provider keys (OpenAI, ElevenLabs, etc.), and connects the social accounts they own. Our pipeline discovers relevant topics, scripts a narrative, generates scene images and voiceover, assembles a vertical or horizontal video, and publishes it to the user's connected accounts on a schedule the user controls. The user reviews and approves the schedule; we never auto-create content on accounts the user did not connect.
@@ -56,6 +82,7 @@ with every platform.
 
 | Item | Value (fill in before submitting) |
 |---|---|
+| Reviewer signup/login URL | `https://app.summitautomates.com/login` (self-serve signup at `/signup`) |
 | Reviewer test login (admin panel) | `reviewer@summitautomates.com` / `[strong password]` |
 | Demo Instagram Business account | `@summit_demo` (you create) |
 | Demo Facebook Page | "Summit Demo" |
@@ -78,12 +105,12 @@ understand they're test fixtures.
 |---|---|
 | App name | Summit Automates |
 | App contact email | admin@summitautomates.com |
-| App domain | summitautomates.com |
-| Privacy policy URL | https://summitautomates.com/privacy |
-| Terms of service URL | https://summitautomates.com/terms |
-| User data deletion | https://summitautomates.com/data-deletion (callback URL for now — see note below) |
+| App domains | summitautomates.com, app.summitautomates.com, api.summitautomates.com |
+| Privacy policy URL | https://app.summitautomates.com/privacy |
+| Terms of service URL | https://app.summitautomates.com/terms |
+| User data deletion | https://app.summitautomates.com/data-deletion (callback URL for now — see note below) |
 | Category | Business |
-| OAuth redirect URI | https://summitautomates.com/api/oauth/meta/callback |
+| OAuth redirect URI | https://api.summitautomates.com/api/oauth/meta/callback |
 
 ### Permissions to request
 
@@ -169,8 +196,8 @@ If your LLC isn't formally registered yet, **register it before submitting**
 
 Meta requires a deauthorization callback URL. We don't ship one yet. Two
 choices:
-1. **Quick path**: list `https://summitautomates.com/data-deletion` as the
-   callback. Meta accepts a manual deletion process. Our Data Deletion
+1. **Quick path**: list `https://app.summitautomates.com/data-deletion` as
+   the callback. Meta accepts a manual deletion process. Our Data Deletion
    page already documents this.
 2. **Proper path (do this in Phase 5 dev work)**: implement
    `POST /api/oauth/meta/deauthorize` that receives Meta's signed request
@@ -193,10 +220,10 @@ choices:
 | User support email | admin@summitautomates.com |
 | Developer contact email | admin@summitautomates.com |
 | Application home page | https://summitautomates.com |
-| Privacy policy URL | https://summitautomates.com/privacy |
-| Terms of service URL | https://summitautomates.com/terms |
-| Authorized domain | summitautomates.com |
-| Authorized redirect URI | https://summitautomates.com/api/oauth/youtube/callback |
+| Privacy policy URL | https://app.summitautomates.com/privacy |
+| Terms of service URL | https://app.summitautomates.com/terms |
+| Authorized domain | summitautomates.com (covers app. + api. subdomains) |
+| Authorized redirect URI | https://api.summitautomates.com/api/oauth/youtube/callback |
 | Application type | Web application |
 
 ### Scopes to request
@@ -248,9 +275,9 @@ HTML file. Required before submission.
 | Description | AI-powered content generation and posting for niche social media operators. |
 | Category | Productivity |
 | Website | https://summitautomates.com |
-| Terms of service URL | https://summitautomates.com/terms |
-| Privacy policy URL | https://summitautomates.com/privacy |
-| Redirect URI | https://summitautomates.com/api/oauth/tiktok/callback |
+| Terms of service URL | https://app.summitautomates.com/terms |
+| Privacy policy URL | https://app.summitautomates.com/privacy |
+| Redirect URI | https://api.summitautomates.com/api/oauth/tiktok/callback |
 | Webhook URL (events) | Leave blank unless you need post-status webhooks |
 
 ### Scopes to request
@@ -316,9 +343,9 @@ with TikTok's AIGC labeling requirements."
 | Description | AI content automation for professional creators on LinkedIn. |
 | Website | https://summitautomates.com |
 | Business email | admin@summitautomates.com |
-| Privacy policy URL | https://summitautomates.com/privacy |
-| Legal agreement URL | https://summitautomates.com/terms |
-| Authorized redirect URL | https://summitautomates.com/api/oauth/linkedin/callback |
+| Privacy policy URL | https://app.summitautomates.com/privacy |
+| Legal agreement URL | https://app.summitautomates.com/terms |
+| Authorized redirect URL | https://api.summitautomates.com/api/oauth/linkedin/callback |
 
 ### Scopes to request
 
@@ -372,11 +399,32 @@ Copy this into a Google Sheet to track each submission:
 
 ## Materials checklist before any submission
 
-- [ ] LLC registered + legal name + address known
-- [ ] summitautomates.com DNS pointing at production deploy
-- [ ] `/`, `/terms`, `/privacy`, `/data-deletion` reachable
-- [ ] `[REPLACE WITH …]` placeholders in terms.tsx / privacy.tsx filled in
+- [x] LLC registered — Summit Systems (Private) Limited, UIN 0324466
+- [x] DNS live — app. + api. subdomains resolve, Let's Encrypt certs valid
+- [x] `/terms`, `/privacy`, `/data-deletion` reachable (200) on app.summitautomates.com
+- [x] Legal entity placeholders filled in (terms.tsx / privacy.tsx)
+- [x] Self-serve signup live at app.summitautomates.com/signup
 - [ ] Reviewer test login `reviewer@summitautomates.com` created with realistic test data (a niche, sample posts, sample connected accounts)
+- [ ] **Per-platform: create the developer app + obtain client ID/secret**, then set the real env vars on Railway (currently placeholders)
 - [ ] Demo social accounts created on each platform (`summit_demo` handle)
 - [ ] Logo / app icon: 1024×1024 PNG
 - [ ] Screencast video uploaded to YouTube unlisted (so each platform can review it)
+
+---
+
+## What's blocking each submission RIGHT NOW
+
+The kit answers are ready, but each platform needs a developer app created
+first (which gives you the client ID/secret to paste into Railway env vars).
+Here's the critical path per platform:
+
+| Platform | You must first… | Then I can… |
+|---|---|---|
+| **Meta** | 1. Create app at developers.facebook.com 2. Start Business Verification (upload SECP cert — `INCORPORATION CERTIFICATE (SUMMIT SYSTEMS).pdf`) | Wire `META_APP_ID`/`META_APP_SECRET`, register the callback URL, fill the review form from this kit |
+| **Google** | 1. Create project at console.cloud.google.com 2. Verify domain in Search Console | Wire `GOOGLE_CLIENT_ID`/`SECRET`, configure consent screen, request the YouTube scopes |
+| **TikTok** | 1. Register at developers.tiktok.com 2. (code) add AI watermark to videos | Wire `TIKTOK_CLIENT_KEY`/`SECRET`, submit Content Posting API audit |
+| **LinkedIn** | 1. Create a LinkedIn **Company Page** for Summit Automates 2. Create app at developer.linkedin.com linked to that Page | Wire `LINKEDIN_CLIENT_ID`/`SECRET`, request "Share on LinkedIn" |
+
+The env var placeholders are already on Railway (`placeholder` values) — once
+you create each developer app, send me the client ID + secret and I'll swap
+them in and register the callback URLs.
